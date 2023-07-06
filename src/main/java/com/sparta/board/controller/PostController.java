@@ -5,12 +5,12 @@ import com.sparta.board.dto.PostResponseDto;
 import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class PostController {
@@ -32,11 +32,19 @@ public class PostController {
 
     // 3. 게시글 작성
     @PostMapping("/posts")
-    public PostResponseDto createPost(
-            @RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String tokenValue,
-            @RequestBody PostRequestDto requestDto){
+    public PostResponseDto createPost(@RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String tokenValue,
+                                      @RequestBody PostRequestDto requestDto) {
 
-        return postService.createpost(tokenValue,requestDto);
+        return postService.createPost(tokenValue, requestDto);
+    }
+
+    // 4. 선택 게시글 수정
+    @PutMapping("/posts/{id}")
+    public PostResponseDto updatePost(@PathVariable Long id,
+                                      @RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String tokenValue,
+                                      @RequestBody PostRequestDto requestDto){
+
+        return postService.updatePost(id,tokenValue,requestDto);
     }
 
 }

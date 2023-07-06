@@ -37,11 +37,10 @@ public class PostService {
     }
 
     // 3. 게시글 작성
-    public PostResponseDto createpost(String tokenValue, PostRequestDto requestDto) {
+    public PostResponseDto createPost(String tokenValue, PostRequestDto requestDto) {
 
         // jwt 토큰 substring
         String token = jwtUtil.substringToken(tokenValue);
-        //        log.error(token);
 
         // jwt 토큰 검증
         if(!jwtUtil.validateToken(token)){
@@ -63,4 +62,8 @@ public class PostService {
     }
 
 
+    public PostResponseDto updatePost(Long id, String tokenValue, PostRequestDto requestDto) {
+
+
+    }
 }

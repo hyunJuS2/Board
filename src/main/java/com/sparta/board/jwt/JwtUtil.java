@@ -5,6 +5,7 @@ import com.sparta.board.entity.UserRoleEnum;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,9 +77,9 @@ public class JwtUtil {
 
     // 2. 생성된 JWT를 Response 객체 Header에 바로 넣어버리기!
 
-//    public void addJwtToHeader(String token, HttpServletResponse response){
-//            response.addHeader(AUTHORIZATION_HEADER, token);
-//    }
+    public void addJwtToHeader(String token, HttpServletResponse response){
+            response.addHeader(AUTHORIZATION_HEADER, token);
+    }
 
      // 3. Header에 들어있는 JWT 토큰을 Substring
 
@@ -92,10 +93,10 @@ public class JwtUtil {
     }
 
     //    4. JWT 검증
-
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token); // key로 token 검증
+            return true;
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
             logger.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
         } catch (ExpiredJwtException e) {
@@ -113,4 +114,8 @@ public class JwtUtil {
     public Claims getUserInfoFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody(); //body부분의 claims를 가지고 올 수 잇음
     }
+
+//    public String getTokenFromRequest(HttpServletRequest req) {
+//        return req.getHeader(AUTHORIZATION_HEADER);
+//    }
 }

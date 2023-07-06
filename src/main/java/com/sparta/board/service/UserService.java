@@ -71,11 +71,14 @@ public class UserService {
         String token = jwtUtil.createToken(user.getUsername(),user.getRole());
         // 헤더 생성
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(JwtUtil.AUTHORIZATION_HEADER, token);
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.add(JwtUtil.AUTHORIZATION_HEADER, token);
 
-//        jwtUtil.addJwtToHeader(token,response);
+        jwtUtil.addJwtToHeader(token,response);
 
-        return new ResponseEntity<>(new ResultResponseDto("로그인 성공!", "200"), headers, HttpStatus.OK);
+        ResultResponseDto resultResponseDto = new ResultResponseDto("로그인이 완료되었습니다.",HttpStatus.OK.toString());
+        return ResponseEntity.ok(resultResponseDto);
+
+//        return new ResponseEntity<>(new ResultResponseDto("로그인 성공!", 200));
     }
 }
