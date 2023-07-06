@@ -4,7 +4,6 @@ package com.sparta.board.jwt;
 import com.sparta.board.entity.UserRoleEnum;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -77,41 +76,35 @@ public class JwtUtil {
 
     // 2. 생성된 JWT를 Response 객체 Header에 바로 넣어버리기!
 
-    public void addJwtToHeader(String token, HttpServletResponse response){
-        try{
-            token = URLEncoder.encode(token,"utf-8").replaceAll("\\+","%20") ;
-            response.addHeader(AUTHORIZATION_HEADER,BEARER_PREFIX + token);
-
-        } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage());
-        }
-    }
+//    public void addJwtToHeader(String token, HttpServletResponse response){
+//            response.addHeader(AUTHORIZATION_HEADER, token);
+//    }
 
      // 3. Header에 들어있는 JWT 토큰을 Substring
 
-    public String subStringToken(String tokenValue){
+    public String substringToken(String tokenValue){
         if(StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)){
             //공백, null을 확인 할 수 있음 && BEARER_PREFIX로 시작하는지 알 수 있음.
             return tokenValue.substring(7);
         }
         logger.error("NOT FOUND TOKEN");
-        throw  new NullPointerException("NOT FOUND TOKEN");
+        throw new NullPointerException("NOT FOUND TOKEN");
     }
 
     //    4. JWT 검증
 
-    public boolean validateToken(String token){
-     try{
-         Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token); // Token의 위,변조 만료가 되지는 않았는지의 검증을 할 수 있음.
-     } catch (SecurityException | MalformedJwtException | SignatureException e) {
-         logger.error("Invalid JWT signature, 유효하지 않은 JWT 서명입니다.");
-     } catch (ExpiredJwtException e) {
-         logger.error("Expired JWT token, 만료된 JWT token 입니다.");
-     } catch (UnsupportedJwtException e) {
-         logger.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
-     } catch (IllegalArgumentException e) {
-         logger.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
-     }
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+        } catch (SecurityException | MalformedJwtException | SignatureException e) {
+            logger.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
+        } catch (ExpiredJwtException e) {
+            logger.error("Expired JWT token, 만료된 JWT token 입니다.");
+        } catch (UnsupportedJwtException e) {
+            logger.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
+        } catch (IllegalArgumentException e) {
+            logger.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
+        }
         return false;
     }
 

@@ -5,10 +5,12 @@ import com.sparta.board.dto.ResultResponseDto;
 import com.sparta.board.dto.SignupRequestDto;
 import com.sparta.board.entity.User;
 import com.sparta.board.entity.UserRoleEnum;
+import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.repository.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     // ADMIN_TOKEN
     private final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
@@ -51,7 +54,7 @@ public class UserService {
         return ResponseEntity.ok(resultResponseDto);
     }
 
-    public ResponseEntity<ResultResponseDto> login(LoginRequestDto loginRequestDto) {
+    public ResponseEntity<ResultResponseDto> login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
 
         String username = loginRequestDto.getUsername();
         String password = loginRequestDto.getPassword();
@@ -65,7 +68,14 @@ public class UserService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다");
         }
 
-        ResultResponseDto resultResponseDto = new ResultResponseDto("로그인이 완료되었습니다.",HttpStatus.OK.toString());
-        return ResponseEntity.ok(resultResponseDto);
+        String token = jwtUtil.createToken(user.getUsername(),user.getRole());
+        // 헤더 생성
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(JwtUtil.AUTHORIZATION_HEADER, token);
+
+//        jwtUtil.addJwtToHeader(token,response);
+
+        return new ResponseEntity<>(new ResultResponseDto("로그인 성공!", "200"), headers, HttpStatus.OK);
     }
 }
