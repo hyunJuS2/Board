@@ -4,6 +4,7 @@ import com.sparta.board.dto.LoginRequestDto;
 import com.sparta.board.dto.ResultResponseDto;
 import com.sparta.board.dto.SignupRequestDto;
 import com.sparta.board.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<ResultResponseDto> signup(@RequestBody SignupRequestDto signupRequestDto){
+    public ResponseEntity<ResultResponseDto> signup(@RequestBody @Valid SignupRequestDto signupRequestDto){
        return userService.signup(signupRequestDto);
     }
 
