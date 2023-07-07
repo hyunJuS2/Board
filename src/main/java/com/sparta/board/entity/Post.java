@@ -31,4 +31,9 @@ public class Post extends Timestamped {
         this.contents = requestDto.getContents();
         this.title = requestDto.getTitle();
     }
+
+    public void update(PostRequestDto requestDto) { // 게시글 수정시 생성자
+        this.title = requestDto.getTitle();
+        this.contents = requestDto.getContents();
+    }
 }
