@@ -85,9 +85,34 @@ public class PostService {
         if(!post.getUsername().equals(username)){
             throw new IllegalArgumentException("해당 게시글의 작성자가 아닙니다.");}
 
-        // 업데이트
+        // 게시글 업데이트
         post.update(requestDto);
 
         return new PostResponseDto(post);
+    }
+
+    public void deletePost(Long id, String tokenValue) {
+
+        // 해당 게시글이 존재하는지 확인
+        Post post = postRepository.findById(id)
+                .orElseThrow(()-> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+
+        // jwt 토큰 substring
+        String token = jwtUtil.substringToken(tokenValue);
+        // jwt 토큰 검증
+        if(!jwtUtil.validateToken(token)){
+            throw new IllegalArgumentException("Token Error");}
+        // 사용자 정보 가져오기
+        Claims info = jwtUtil.getUserInfoFromToken(token);
+        //이름 가져오기
+        String username = info.getSubject();
+
+        //게시글의 작성자와 토큰에서 가져온 사용자 정보와 일치하지 않을 때
+        if(!post.getUsername().equals(username)){
+            throw new IllegalArgumentException("해당 게시글의 작성자가 아닙니다.");}
+
+        // 게시글 삭제
+        postRepository.delete(post);
+
     }
 }
