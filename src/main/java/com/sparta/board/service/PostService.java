@@ -68,8 +68,7 @@ public class PostService {
     public PostResponseDto updatePost(Long id, String tokenValue, PostRequestDto requestDto) {
 
         // 해당 게시글이 존재하는지 확인
-        Post post = postRepository.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+        Post post = findPost(id);
 
         // jwt 토큰 substring
         String token = jwtUtil.substringToken(tokenValue);
@@ -94,8 +93,7 @@ public class PostService {
     public void deletePost(Long id, String tokenValue) {
 
         // 해당 게시글이 존재하는지 확인
-        Post post = postRepository.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+        Post post = findPost(id);
 
         // jwt 토큰 substring
         String token = jwtUtil.substringToken(tokenValue);
@@ -113,6 +111,15 @@ public class PostService {
 
         // 게시글 삭제
         postRepository.delete(post);
-
     }
+
+    private Post findPost(Long id) {
+        // 해당 게시글이 존재하는지 확인
+        Post post = postRepository.findById(id)
+                .orElseThrow(()-> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+
+        return post;
+    }
+
+
 }
