@@ -1,9 +1,12 @@
 package com.sparta.board.service;
 
+import com.sparta.board.dto.CommentResponseDto;
 import com.sparta.board.dto.PostRequestDto;
 import com.sparta.board.dto.PostResponseDto;
+import com.sparta.board.entity.Comment;
 import com.sparta.board.entity.Post;
 import com.sparta.board.jwt.JwtUtil;
+import com.sparta.board.repository.CommentRepository;
 import com.sparta.board.repository.PostRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -19,14 +24,31 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
     private final JwtUtil jwtUtil;
 
-    // 1. 전체 게시글 조회
+    // 1. 전체 게시글 조회 +) 모든 게시글에 해당하는 모든댓글까지 모두 조회
     public List<PostResponseDto> getPosts() {
-        return postRepository.findAllByOrderByCreatedAtDesc().stream().map(PostResponseDto::new).toList();
+        List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc();
+        List<PostResponseDto> responseDtoList = new ArrayList<>(); // 값을 담을 리스트 생성
+
+        for (Post post : posts) {
+            List<Comment> comments = commentRepository.findAllByPostOrderByCreatedAtDesc(post); //post에 해당하는 comment 값들 가져오기
+            List<CommentResponseDto> commentResponseDtosList = new ArrayList<>();
+
+            for (Comment comment : comments) {
+                CommentResponseDto commentResponseDto = new CommentResponseDto(comment);
+                commentResponseDtosList.add(commentResponseDto);
+            }
+
+            PostResponseDto responseDto = new PostResponseDto(post, commentResponseDtosList); //여기 responseDto로 바꾸기 -> 수정시간은 필요없어서 빼야겠음!
+            responseDtoList.add(responseDto);
+        }
+        return responseDtoList;
     }
 
-    // 2. 선택 게시글 조회
+
+    // 2. 선택 게시글 조회 +) 선택한 게시글에 해당하는 댓글까지 모두 조회
     public PostResponseDto getPost(Long id) {
 
         // 해당 게시글 찾기

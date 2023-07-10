@@ -1,5 +1,6 @@
 package com.sparta.board.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sparta.board.dto.CommentRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -23,8 +24,9 @@ public class Comment extends Timestamped{
     @Column(nullable = false,  length = 500)
     private String comment;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
     private Post post;
 
     public Comment(String username, CommentRequestDto requestDto, Post post) { //댓글 등록시
@@ -32,7 +34,5 @@ public class Comment extends Timestamped{
         this.username = username;
         this.post = post;
         this.comment = requestDto.getComment();
-
-
     }
 }

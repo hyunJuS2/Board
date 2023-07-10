@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -29,7 +30,7 @@ public class Post extends Timestamped {
     private String title;
 
     @OneToMany(mappedBy = "post")
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
     public Post(String username, PostRequestDto requestDto) { // 게시글 등록 생성자
         this.username = username;
