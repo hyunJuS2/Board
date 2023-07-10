@@ -1,9 +1,8 @@
 package com.sparta.board.controller;
 
-import com.sparta.board.dto.PostRequestDto;
-import com.sparta.board.dto.PostResponseDto;
-import com.sparta.board.dto.ResultResponseDto;
+import com.sparta.board.dto.*;
 import com.sparta.board.jwt.JwtUtil;
+import com.sparta.board.service.CommentService;
 import com.sparta.board.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,15 +17,14 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
-    //private final JwtUtil jwtUtil;
+    private final CommentService commentService;
 
-    // 1. 전체 게시글 조회
+
+    // 1. 전체 게시글 조회 +) 모든 댓글 조회
     @GetMapping("/")
-    public List<PostResponseDto> getPosts() {
-        return postService.getPosts();
-    }
+    public List<PostResponseDto> getPosts() { return postService.getPosts();}
 
-    // 2. 선택 게시글 조회
+    // 2. 선택 게시글 조회 +) 모든 댓글 조회
     @GetMapping("/{id}")
     public PostResponseDto getPost(@PathVariable Long id) {
         return postService.getPost(id);
@@ -57,4 +55,14 @@ public class PostController {
         postService.deletePost(id,tokenValue);
         return ResponseEntity.ok(new ResultResponseDto("삭제가 완료되었습니다.", HttpStatus.OK.toString()));
     }
+
+    // 1. 댓글 작성
+    @PostMapping("/{id}/comment")
+    public CommentResponseDto createComment(@RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String tokenValue,
+                                            @PathVariable Long id,
+                                            @RequestBody CommentRequestDto requestDto) {
+
+        return commentService.createComment(tokenValue, id, requestDto);
+    }
+
 }

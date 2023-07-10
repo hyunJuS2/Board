@@ -1,10 +1,11 @@
 package com.sparta.board.entity;
 
+import com.sparta.board.dto.CommentRequestDto;
 import jakarta.persistence.*;
-import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 
 @Entity
 @Setter
@@ -23,6 +24,15 @@ public class Comment extends Timestamped{
     private String comment;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
+
+    public Comment(String username, CommentRequestDto requestDto, Post post) { //댓글 등록시
+
+        this.username = username;
+        this.post = post;
+        this.comment = requestDto.getComment();
+
+
+    }
 }

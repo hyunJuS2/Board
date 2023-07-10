@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,6 +27,9 @@ public class Post extends Timestamped {
 
     @Column(name = "title") //null 값 허용
     private String title;
+
+    @OneToMany(mappedBy = "post")
+    private List<Comment> comments;
 
     public Post(String username, PostRequestDto requestDto) { // 게시글 등록 생성자
         this.username = username;
