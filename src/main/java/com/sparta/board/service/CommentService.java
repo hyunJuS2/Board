@@ -31,14 +31,12 @@ public class CommentService {
 
         //작성되 게시글이 있는지 확인
         Post post = findPost(id);
-
         // jwt 토큰 substring
         String token = jwtUtil.substringToken(tokenValue);
 
         // jwt 토큰 검증
         if(!jwtUtil.validateToken(token)){
-            throw new IllegalArgumentException("Token Error");
-        }
+            throw new IllegalArgumentException("Token Error"); }
 
         // 사용자 정보 가져오기
         Claims info = jwtUtil.getUserInfoFromToken(token);
@@ -58,9 +56,11 @@ public class CommentService {
     @Transactional
     public CommentResponseDto updateComment(Long postId, Long commentId, CommentRequestDto commentRequestDto, String tokenValue) {
 
-        Comment comment = postAndCommentCheck(postId, commentId);
+        // 게시글이 존재하는지 확인
+        findPost(postId);
+        // 댓글이 존재하는지 확인
+        Comment comment = findComment(commentId);
         tokenCheck(jwtUtil.substringToken(tokenValue), comment);
-
 
         comment.update(commentRequestDto);
         return new CommentResponseDto(comment);
@@ -78,31 +78,30 @@ public class CommentService {
     private Post findPost(Long id) {
         // 해당 게시글이 존재하는지 확인
         Post post = postRepository.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
-
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
         return post;
     }
 
-
-    public Comment postAndCommentCheck(Long postId, Long commentId){
-        postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
-
+    private Comment findComment(Long commentId){
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
 
         return comment;
     }
 
+
+    // 수정, 삭제 시 jwt 권한 인증 (role 인증까지)
     private String tokenCheck(String token, Comment comment) {
         // jwt 토큰 검증
         if (!jwtUtil.validateToken(token)) {
             throw new CustomException("토큰이 유효하지 않습니다", "400");
         }
+        // 사용자 정보 가져오기
         Claims info = jwtUtil.getUserInfoFromToken(token);
+        // 이름 가져오기
         String username = info.getSubject();
+        // 사용자 권한 가져오기
         String role = info.get("auth", String.class);
-
 
         if (!comment.getUsername().equals(username) && role.equals("USER")) {
             throw new CustomException("작성자만 삭제/수정할 수 있습니다.", "400");

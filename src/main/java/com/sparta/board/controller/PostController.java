@@ -78,7 +78,7 @@ public class PostController {
     @DeleteMapping("/{id}/comment/{commentId}")
     public ResultResponseDto deleteComment(
             @PathVariable Long id,
-            @RequestParam("commentid") Long commentId,
+            @PathVariable Long commentId, //@RequestParam 둘중에 뭐가 더 좋은 지
             @RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String tokenValue) {
 
         return commentService.deleteComment(id, commentId, tokenValue);
