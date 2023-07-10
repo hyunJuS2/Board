@@ -16,7 +16,7 @@ import lombok.Setter;
 public class Comment extends Timestamped{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long commentid;
 
     @Column(nullable = false)
     private String username;
@@ -34,5 +34,9 @@ public class Comment extends Timestamped{
         this.username = username;
         this.post = post;
         this.comment = requestDto.getComment();
+    }
+
+    public void update(CommentRequestDto commentRequestDto) {
+        this.comment = commentRequestDto.getComment();
     }
 }
