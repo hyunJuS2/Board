@@ -1,8 +1,6 @@
 package com.sparta.board.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,14 +8,12 @@ import lombok.Setter;
 @Setter
 public class SignupRequestDto {
 
-    @NotBlank
-    @Size(min = 4, max = 10)
-    @Pattern(regexp = "^[a-z0-9]+$")
+    @Pattern(regexp = "^[a-z0-9]{4,10}$", message = "소문자, 숫자 포함 4-10자리를 입력했는지 확인하세요.")
     private String username;
 
-    @NotBlank
-    @Size(min = 8, max = 15)
-    @Pattern(regexp = "^[a-zA-Z0-9]+$")
+
+    @Pattern(regexp = "^[A-Za-z0-9!@#$%^&*\\])(?=.]{8,15}$",
+            message = "대소문자, 숫자, 특수문자(!@#$%^&*)가 최소 하나씩 들어가는 8-15 자리를 입력했는지 확인하세요")
     private String password;
     private boolean admin = false;
     private String adminToken = "";
