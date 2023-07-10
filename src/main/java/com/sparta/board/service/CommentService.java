@@ -1,18 +1,17 @@
 package com.sparta.board.service;
 
-import com.sparta.board.dto.CommentRequestDto;
-import com.sparta.board.dto.CommentResponseDto;
-import com.sparta.board.dto.PostRequestDto;
-import com.sparta.board.dto.PostResponseDto;
+import com.sparta.board.dto.*;
 import com.sparta.board.entity.Comment;
 import com.sparta.board.entity.Post;
 import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.repository.CommentRepository;
 import com.sparta.board.repository.PostRepository;
+import com.sparta.board.service.exception.CustomException;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -60,4 +59,44 @@ public class CommentService {
         return post;
     }
 
+    @Transactional
+    public CommentResponseDto updateComment(Long postId, Long commentId, CommentRequestDto commentRequestDto, String tokenValue) {
+        Comment comment = postAndCommentCheck(postId, commentId);
+        tokenCheck(jwtUtil.substringToken(tokenValue), comment);
+
+        comment.update(commentRequestDto);
+        return new CommentResponseDto(comment);
+    }
+
+    public ResultResponseDto deleteComment(Long postId, Long commentId, String tokenValue) {
+        Comment comment = postAndCommentCheck(postId, commentId);
+        tokenCheck(jwtUtil.substringToken(tokenValue), comment);
+
+        commentRepository.delete(comment);
+        return new ResultResponseDto("삭제가 완료되었습니다.", "200");
+    }
+
+    public Comment postAndCommentCheck(Long postId, Long commentId){
+        postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
+
+        return comment;
+    }
+
+    private String tokenCheck(String token, Comment comment) {
+        // jwt 토큰 검증
+        if (!jwtUtil.validateToken(token)) {
+            throw new CustomException("토큰이 유효하지 않습니다", "400");
+        }
+        Claims info = jwtUtil.getUserInfoFromToken(token);
+        String username = info.getSubject();
+
+        if (!comment.getUsername().equals(username)) {
+            throw new CustomException("작성자만 삭제/수정할 수 있습니다.", "400");
+        }
+        return username;
+    }
 }
