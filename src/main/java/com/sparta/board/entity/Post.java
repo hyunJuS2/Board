@@ -29,7 +29,7 @@ public class Post extends Timestamped {
     @Column(name = "title") //null 값 허용
     private String title;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<Comment> comments = new ArrayList<>();
 
     public Post(String username, PostRequestDto requestDto) { // 게시글 등록 생성자

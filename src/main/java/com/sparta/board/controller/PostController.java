@@ -65,17 +65,17 @@ public class PostController {
         return commentService.createComment(tokenValue, id, requestDto);
     }
 
-    @PutMapping("/{id}/comment")
+    @PutMapping("/{id}/comment/{commentid}/")
     public CommentResponseDto updateComment(
             @PathVariable Long id,
-            @RequestParam("commentid") Long commentId,
+            @PathVariable Long commentId,
             @RequestBody CommentRequestDto commentRequestDto,
             @RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String tokenValue){
 
 
         return commentService.updateComment(id, commentId, commentRequestDto, tokenValue);
     }
-    @DeleteMapping("/{id}/comment")
+    @DeleteMapping("/{id}/comment/{commentId}")
     public ResultResponseDto deleteComment(
             @PathVariable Long id,
             @RequestParam("commentid") Long commentId,

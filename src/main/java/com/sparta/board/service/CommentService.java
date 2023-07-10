@@ -67,7 +67,8 @@ public class CommentService {
     }
 
     public ResultResponseDto deleteComment(Long postId, Long commentId, String tokenValue) {
-        Comment comment = postAndCommentCheck(postId, commentId);
+        findPost(postId);
+        Comment comment = findComment(commentId);
         tokenCheck(jwtUtil.substringToken(tokenValue), comment);
 
         commentRepository.delete(comment);
