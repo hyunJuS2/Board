@@ -36,16 +36,30 @@ public class PostService {
             List<Comment> comments = commentRepository.findAllByPostOrderByCreatedAtDesc(post); //post에 해당하는 comment 값들 가져오기
             List<CommentResponseDto> commentResponseDtosList = new ArrayList<>();
 
+            //여기 CommentResponseDto로 넣어주기 -> 수정시간은 필요없어서 빼야겠음!
             for (Comment comment : comments) {
                 CommentResponseDto commentResponseDto = new CommentResponseDto(comment);
                 commentResponseDtosList.add(commentResponseDto);
             }
-
-            PostResponseDto responseDto = new PostResponseDto(post, commentResponseDtosList); //여기 responseDto로 바꾸기 -> 수정시간은 필요없어서 빼야겠음!
+            PostResponseDto responseDto = new PostResponseDto(post, commentResponseDtosList);
             responseDtoList.add(responseDto);
         }
         return responseDtoList;
     }
+
+//    수정시간을 넣어도 상관없다면 아래와 같은 코드로 굳이 Response객체에 담지 않고 comment 객체로 넣어 담아줄 수 있음.
+
+//    public List<PostResponseDto> getPosts() {
+//        List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc();
+//        List<PostResponseDto> responseDtoList = new ArrayList<>(); // 값을 담을 리스트 생성
+//
+//        for (Post post : posts) {
+//            List<Comment> comments = commentRepository.findAllByPostOrderByCreatedAtDesc(post); //post에 해당하는 comment 값들 가져오기
+//            PostResponseDto responseDto = new PostResponseDto(post, comments); //여기 responseDto로 바꾸기 -> 수정시간은 필요없어서 빼야겠음!
+//            responseDtoList.add(responseDto);
+//        }
+//        return responseDtoList;
+//    }
 
 
     // 2. 선택 게시글 조회 +) 선택한 게시글에 해당하는 댓글까지 모두 조회
@@ -55,8 +69,18 @@ public class PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(()-> new IllegalArgumentException("게시글이 존재하지 않습니다."));
 
+        // 해당 게시글에 해당하는 댓글 찾기
+        List<Comment> comments = commentRepository.findAllByPostOrderByCreatedAtDesc(post);
+        // 댓글을 담을 리스트 생성
+        List<CommentResponseDto> commentResponseDtosList = new ArrayList<>();
+
+        //CommentResponseDto에 하나씩 담아서 생성한 List에 담아주기
+        for (Comment comment : comments) {
+            CommentResponseDto commentResponseDto = new CommentResponseDto(comment);
+            commentResponseDtosList.add(commentResponseDto);
+        }
         //객체에 담아 return
-        return new PostResponseDto(post);
+        return new PostResponseDto(post,commentResponseDtosList);
     }
 
     // 3. 게시글 작성
