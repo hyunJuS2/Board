@@ -7,14 +7,14 @@ import java.time.LocalDateTime;
 
 @Getter
 public class CommentResponseDto {
-    private Long id;
+    private Long commentid;
     private String username;
     private String comment;
     private LocalDateTime createdAt;
 
 
     public CommentResponseDto(Comment comment) {
-        this.id = comment.getId();
+        this.commentid = comment.getCommentid();
         this.username = comment.getUsername();
         this.comment = comment.getComment();
         this.createdAt = comment.getCreatedAt();
