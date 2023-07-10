@@ -31,12 +31,12 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<ResultResponseDto> signup(@Valid @RequestBody SignupRequestDto signupRequestDto){
         // Validation 예외처리
-        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-        if (fieldErrors.size() > 0) {
-            for (FieldError fieldError : bindingResult.getFieldErrors()) {
-                log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
-            }
-        }
+//        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+//        if (fieldErrors.size() > 0) {
+//            for (FieldError fieldError : bindingResult.getFieldErrors()) {
+//                log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
+//            }
+//        }
         return userService.signup(signupRequestDto);
     }
 
