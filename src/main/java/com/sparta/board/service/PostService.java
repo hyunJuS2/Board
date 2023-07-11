@@ -90,7 +90,7 @@ public class PostService {
 
         // jwt 토큰 검증
         if(!jwtUtil.validateToken(token)){
-            throw new IllegalArgumentException("Token Error");
+            throw new IllegalArgumentException("토큰이 유효하지 않습니다.");
         }
         // 사용자 정보 가져오기
         Claims info = jwtUtil.getUserInfoFromToken(token);
@@ -119,7 +119,7 @@ public class PostService {
         String token = jwtUtil.substringToken(tokenValue);
         // jwt 토큰 검증
         if(!jwtUtil.validateToken(token)){
-            throw new IllegalArgumentException("Token Error");}
+            throw new IllegalArgumentException("토큰이 유효하지 않습니다.");}
         // 사용자 정보 가져오기
         Claims info = jwtUtil.getUserInfoFromToken(token);
         //이름 가져오기
@@ -144,7 +144,7 @@ public class PostService {
         String token = jwtUtil.substringToken(tokenValue);
         // jwt 토큰 검증
         if(!jwtUtil.validateToken(token)){
-            throw new IllegalArgumentException("Token Error");}
+            throw new IllegalArgumentException("토큰이 유효하지 않습니다.");}
         // 사용자 정보 가져오기
         Claims info = jwtUtil.getUserInfoFromToken(token);
         //이름 가져오기

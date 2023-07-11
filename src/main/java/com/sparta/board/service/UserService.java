@@ -9,7 +9,6 @@ import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,31 +26,30 @@ public class UserService {
     private final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
 
     public ResponseEntity<ResultResponseDto> signup(SignupRequestDto signupRequestDto) {
+
         String username = signupRequestDto.getUsername();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
 
         // 사용자 중복 확인
         Optional<User> checkUsername = userRepository.findByUsername(username);
-        if(checkUsername.isPresent()){
-            ResultResponseDto resultResponseDto =
-                    new ResultResponseDto("중복된 username 이 존재합니다.",400);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resultResponseDto);
+        if (checkUsername.isPresent()) {
+            throw new IllegalArgumentException("중복된 username이 존재합니다.");
         }
 
         // 사용자 ROLE 확인
         UserRoleEnum role = UserRoleEnum.USER;
-        if(signupRequestDto.isAdmin()){ //true -> 관리자 권한
-            if(!ADMIN_TOKEN.equals(signupRequestDto.getAdminToken())){
+        if (signupRequestDto.isAdmin()) { //true -> 관리자 권한
+            if (!ADMIN_TOKEN.equals(signupRequestDto.getAdminToken())) {
                 throw new IllegalArgumentException("관리자 암호가 틀려 등록이 불가능 합니다.");
             }
             role = UserRoleEnum.ADMIN;
         }
 
         // 사용자 등록
-        User user = new User(username,password,role);
+        User user = new User(username, password, role);
         userRepository.save(user);
 
-        ResultResponseDto resultResponseDto = new ResultResponseDto("회원가입이 완료되었습니다.",200);
+        ResultResponseDto resultResponseDto = new ResultResponseDto("회원가입이 완료되었습니다.", 200);
         return ResponseEntity.ok(resultResponseDto);
     }
 
@@ -60,40 +58,19 @@ public class UserService {
         String username = loginRequestDto.getUsername();
         String password = loginRequestDto.getPassword();
 
-        try{
-            // 사용자 확인
-            User user = userRepository.findByUsername(username)
-                    .orElseThrow(()-> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
-            //비밀번호 확인
-            if(!passwordEncoder.matches(password,user.getPassword())){
-                throw new IllegalArgumentException("비밀번호가 일치하지 않습니다");
-            }
-
-            String token = jwtUtil.createToken(user.getUsername(),user.getRole());
-            // 헤더 생성
-            jwtUtil.addJwtToHeader(token,response);
-
-            ResultResponseDto resultResponseDto = new ResultResponseDto("로그인이 완료되었습니다.",200);
-            return ResponseEntity.ok(resultResponseDto);
-
-        }
-        catch (IllegalArgumentException e){ // 예외처리
-            ResultResponseDto resultResponseDto = new ResultResponseDto("회원을 찾을 수 없습니다.",400);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resultResponseDto);
+        // 사용자 확인
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
+        //비밀번호 확인
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다");
         }
 
-
-//        String token = jwtUtil.createToken(user.getUsername(),user.getRole());
+        String token = jwtUtil.createToken(user.getUsername(), user.getRole());
         // 헤더 생성
+        jwtUtil.addJwtToHeader(token, response);
 
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add(JwtUtil.AUTHORIZATION_HEADER, token);
-
-//        jwtUtil.addJwtToHeader(token,response);
-//
-//        ResultResponseDto resultResponseDto = new ResultResponseDto("로그인이 완료되었습니다.",HttpStatus.OK.toString());
-//        return ResponseEntity.ok(resultResponseDto);
-
-//        return new ResponseEntity<>(new ResultResponseDto("로그인 성공!", 200));
+        ResultResponseDto resultResponseDto = new ResultResponseDto("로그인이 완료되었습니다.", 200);
+        return ResponseEntity.ok(resultResponseDto);
     }
 }

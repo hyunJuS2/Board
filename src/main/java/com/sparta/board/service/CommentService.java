@@ -88,13 +88,14 @@ public class CommentService {
     // 수정, 삭제 시 jwt 권한 인증 (role 인증까지)
     private void tokenCheck(String token, Comment comment) {
         if (!jwtUtil.validateToken(token)) {
-            throw new IllegalArgumentException("토큰이 유효하지 않습니다.");
-        }
-//            ResultResponseDto resultResponseDto = new ResultResponseDto("토큰이 유효하지 않습니다", "400");
+            throw new IllegalArgumentException("토큰이 유효하지 않습니다.");}
 
-    Claims info = jwtUtil.getUserInfoFromToken(token);
+        //사용자 정보가져오기
+        Claims info = jwtUtil.getUserInfoFromToken(token);
+
         // 이름 가져오기
         String username = info.getSubject();
+
         // 사용자 권한 가져오기
         String role = info.get("auth", String.class);
 

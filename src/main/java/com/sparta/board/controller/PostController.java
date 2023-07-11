@@ -22,7 +22,7 @@ public class PostController {
 
 
     // 1. 전체 게시글 조회 +) 모든 댓글 조회
-    @GetMapping
+    @GetMapping("/")
     public List<PostResponseDto> getPosts() { return postService.getPosts();}
 
     // 2. 선택 게시글 조회 +) 모든 댓글 조회
@@ -32,7 +32,7 @@ public class PostController {
     }
 
     // 3. 게시글 작성
-    @PostMapping
+    @PostMapping("/")
     public PostResponseDto createPost(@RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String tokenValue,
                                       @RequestBody PostRequestDto requestDto) {
 
@@ -83,16 +83,5 @@ public class PostController {
             @RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String tokenValue) {
 
         return commentService.deleteComment(id, commentId, tokenValue);
-    }
-
-    @ExceptionHandler({IllegalArgumentException.class})
-    public ResponseEntity<RestApiException> handleException(IllegalArgumentException ex) {
-        RestApiException restApiException = new RestApiException(ex.getMessage(), HttpStatus.BAD_REQUEST.value());
-        return new ResponseEntity<>(
-                // HTTP body
-                restApiException,
-                // HTTP status code
-                HttpStatus.BAD_REQUEST
-        );
     }
 }

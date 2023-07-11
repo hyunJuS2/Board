@@ -75,10 +75,10 @@ public class JwtUtil {
     // 2. 생성된 JWT를 Response 객체 Header에 바로 넣어버리기!
 
     public void addJwtToHeader(String token, HttpServletResponse response){
-            response.addHeader(AUTHORIZATION_HEADER, token);
+        response.addHeader(AUTHORIZATION_HEADER, token);
     }
 
-     // 3. Header에 들어있는 JWT 토큰을 Substring
+    // 3. Header에 들어있는 JWT 토큰을 Substring
 
     public String substringToken(String tokenValue){
         if(StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)){
@@ -111,8 +111,4 @@ public class JwtUtil {
     public Claims getUserInfoFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody(); //body부분의 claims를 가지고 올 수 잇음
     }
-
-//    public String getTokenFromRequest(HttpServletRequest req) {
-//        return req.getHeader(AUTHORIZATION_HEADER);
-//    }
 }
