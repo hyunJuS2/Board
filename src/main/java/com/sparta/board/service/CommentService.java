@@ -6,17 +6,12 @@ import com.sparta.board.entity.Post;
 import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.repository.CommentRepository;
 import com.sparta.board.repository.PostRepository;
-import com.sparta.board.repository.UserRepository;
-import com.sparta.board.service.exception.CustomException;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static java.rmi.server.LogStream.log;
 
 @Service
 @Slf4j
@@ -61,7 +56,6 @@ public class CommentService {
         // 댓글이 존재하는지 확인
         Comment comment = findComment(commentId);
         tokenCheck(jwtUtil.substringToken(tokenValue), comment);
-
         comment.update(commentRequestDto);
         return new CommentResponseDto(comment);
     }
@@ -91,20 +85,20 @@ public class CommentService {
 
 
     // 수정, 삭제 시 jwt 권한 인증 (role 인증까지)
-    private String tokenCheck(String token, Comment comment) {
-        // jwt 토큰 검증
+    private void tokenCheck(String token, Comment comment) {
         if (!jwtUtil.validateToken(token)) {
-            throw new CustomException("토큰이 유효하지 않습니다", "400");
+            throw new IllegalArgumentException("토큰이 유효하지 않습니다.");
         }
-        // 사용자 정보 가져오기
-        Claims info = jwtUtil.getUserInfoFromToken(token);
+//            ResultResponseDto resultResponseDto = new ResultResponseDto("토큰이 유효하지 않습니다", "400");
+
+    Claims info = jwtUtil.getUserInfoFromToken(token);
         // 이름 가져오기
         String username = info.getSubject();
         // 사용자 권한 가져오기
         String role = info.get("auth", String.class);
 
         if (!comment.getUsername().equals(username) && role.equals("USER")) {
-            throw new CustomException("작성자만 삭제/수정할 수 있습니다.", "400");
+            throw new IllegalArgumentException("작성자만 삭제/수정할 수 있습니다.");
         }
         return username;
     }

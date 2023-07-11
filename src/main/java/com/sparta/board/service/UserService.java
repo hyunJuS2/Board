@@ -9,7 +9,6 @@ import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,7 +33,9 @@ public class UserService {
         // 사용자 중복 확인
         Optional<User> checkUsername = userRepository.findByUsername(username);
         if(checkUsername.isPresent()){
-           throw new IllegalArgumentException("중복된 사용자가 존재합니다.");
+            ResultResponseDto resultResponseDto =
+                    new ResultResponseDto("중복된 username 이 존재합니다.",400);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resultResponseDto);
         }
 
         // 사용자 ROLE 확인
@@ -50,7 +51,7 @@ public class UserService {
         User user = new User(username,password,role);
         userRepository.save(user);
 
-        ResultResponseDto resultResponseDto = new ResultResponseDto("회원가입이 완료되었습니다.",HttpStatus.OK.toString());
+        ResultResponseDto resultResponseDto = new ResultResponseDto("회원가입이 완료되었습니다.",200);
         return ResponseEntity.ok(resultResponseDto);
     }
 
@@ -59,25 +60,39 @@ public class UserService {
         String username = loginRequestDto.getUsername();
         String password = loginRequestDto.getPassword();
 
-        // 사용자 확인
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(()-> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
+        try{
+            // 사용자 확인
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(()-> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
+            //비밀번호 확인
+            if(!passwordEncoder.matches(password,user.getPassword())){
+                throw new IllegalArgumentException("비밀번호가 일치하지 않습니다");
+            }
 
-        //비밀번호 확인
-        if(!passwordEncoder.matches(password,user.getPassword())){
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다");
+            String token = jwtUtil.createToken(user.getUsername(),user.getRole());
+            // 헤더 생성
+            jwtUtil.addJwtToHeader(token,response);
+
+            ResultResponseDto resultResponseDto = new ResultResponseDto("로그인이 완료되었습니다.",200);
+            return ResponseEntity.ok(resultResponseDto);
+
+        }
+        catch (IllegalArgumentException e){ // 예외처리
+            ResultResponseDto resultResponseDto = new ResultResponseDto("회원을 찾을 수 없습니다.",400);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resultResponseDto);
         }
 
-        String token = jwtUtil.createToken(user.getUsername(),user.getRole());
+
+//        String token = jwtUtil.createToken(user.getUsername(),user.getRole());
         // 헤더 생성
 
 //        HttpHeaders headers = new HttpHeaders();
 //        headers.add(JwtUtil.AUTHORIZATION_HEADER, token);
 
-        jwtUtil.addJwtToHeader(token,response);
-
-        ResultResponseDto resultResponseDto = new ResultResponseDto("로그인이 완료되었습니다.",HttpStatus.OK.toString());
-        return ResponseEntity.ok(resultResponseDto);
+//        jwtUtil.addJwtToHeader(token,response);
+//
+//        ResultResponseDto resultResponseDto = new ResultResponseDto("로그인이 완료되었습니다.",HttpStatus.OK.toString());
+//        return ResponseEntity.ok(resultResponseDto);
 
 //        return new ResponseEntity<>(new ResultResponseDto("로그인 성공!", 200));
     }

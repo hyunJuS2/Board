@@ -1,16 +1,17 @@
 package com.sparta.board.dto;
 
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
+import lombok.Setter;
 
 
 @Getter
+@Setter
 public class ResultResponseDto {
-    private String message;
-    private String statusCode;
+    private final String Message;
+    private final int statusCode;
 
-    public ResultResponseDto(String msg, String httpStatus) {
-        this.message = msg;
-        this.statusCode = httpStatus;
+    public ResultResponseDto(String Message , int statusCode) {
+        this.Message = Message;
+        this.statusCode = statusCode;
     }
 }

@@ -4,6 +4,7 @@ import com.sparta.board.dto.*;
 import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.service.CommentService;
 import com.sparta.board.service.PostService;
+import com.sparta.board.exception.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,7 +54,7 @@ public class PostController {
                                                         @RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String tokenValue){
 
         postService.deletePost(id,tokenValue);
-        return ResponseEntity.ok(new ResultResponseDto("삭제가 완료되었습니다.", HttpStatus.OK.toString()));
+        return ResponseEntity.ok(new ResultResponseDto("삭제가 완료되었습니다.",200));
     }
 
     // 1. 댓글 작성
