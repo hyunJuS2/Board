@@ -60,13 +60,14 @@ public class CommentService {
         return new CommentResponseDto(comment);
     }
 
-    public ResultResponseDto deleteComment(Long postId, Long commentId, String tokenValue) {
+    public ResponseEntity<ResultResponseDto> deleteComment(Long postId, Long commentId, String tokenValue) {
         findPost(postId);
         Comment comment = findComment(commentId);
         tokenCheck(jwtUtil.substringToken(tokenValue), comment);
 
         commentRepository.delete(comment);
-        return new ResultResponseDto("삭제가 완료되었습니다.", "200");
+        ResultResponseDto resultResponseDto = new ResultResponseDto("삭제가 완료되었습니다",200);
+        return ResponseEntity.ok(resultResponseDto);
     }
 
     private Post findPost(Long id) {
@@ -100,6 +101,5 @@ public class CommentService {
         if (!comment.getUsername().equals(username) && role.equals("USER")) {
             throw new IllegalArgumentException("작성자만 삭제/수정할 수 있습니다.");
         }
-        return username;
     }
 }
