@@ -23,7 +23,6 @@ import java.util.Locale;
 
 @RestController
 @Slf4j
-//@Validated
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {

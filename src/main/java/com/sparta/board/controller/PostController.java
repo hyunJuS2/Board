@@ -4,9 +4,7 @@ import com.sparta.board.dto.*;
 import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.service.CommentService;
 import com.sparta.board.service.PostService;
-import com.sparta.board.exception.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
